@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tomodachi Collection Web</title>
+    <title>Tomodachi Collection Web - Romance Update</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -41,20 +41,22 @@
             position: absolute;
             top: -10px;
             right: -10px;
-            background: #ff5f5f;
-            color: white;
             border-radius: 50%;
             width: 36px;
             height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
             animation: bounce 1s infinite alternate;
             border: 2px solid white;
+            z-index: 20;
         }
+        
+        .bubble-trouble { background: #ff5f5f; color: white; }
+        .bubble-love { background: #f472b6; color: white; font-size: 18px; }
 
         @keyframes bounce {
             0% { transform: translateY(0) scale(1); }
@@ -77,7 +79,7 @@
         .news-content {
             display: inline-block;
             padding-left: 100%;
-            animation: ticker 35s linear infinite;
+            animation: ticker 30s linear infinite;
         }
 
         @keyframes ticker {
@@ -115,345 +117,8 @@
         .gender-selector input:checked + label {
             background-color: #38bdf8;
             color: white;
-            border-color: #38bdf8;
-        }
-        
-        .gender-selector-female input:checked + label {
-            background-color: #f472b6;
-            color: white;
-            border-color: #f472b6;
-        }
+            border-color: #3
 
-        .celebration {
-            animation: pop-in 0.5s cubic-bezier(0.26, 0.53, 0.74, 1.48);
-        }
 
-        @keyframes pop-in {
-            0% { transform: scale(0.5); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-    </style>
-</head>
-<body>
 
-<div class="island-bg pb-24">
-    <!-- Header -->
-    <header class="p-6 flex justify-between items-center bg-white/70 backdrop-blur-md sticky top-0 z-50 border-b border-white/20 shadow-md">
-        <div>
-            <h1 class="text-2xl font-bold text-sky-600 tracking-tight flex items-center gap-2">
-                🏝️ トモダチコレクション Web
-            </h1>
-            <p class="text-sm text-gray-500 font-medium ml-1">島の人口: <span id="population-count" class="text-sky-500 font-bold">0</span> 人</p>
-        </div>
-        <button onclick="openCreateModal()" class="bg-sky-500 hover:bg-sky-600 text-white px-6 py-2.5 rounded-full font-bold shadow-lg transition-all active:scale-95 transform hover:-translate-y-1">
-            ＋ 新しい住人
-        </button>
-    </header>
 
-    <!-- Apartment View -->
-    <main class="max-w-5xl mx-auto mt-8 px-4">
-        <div class="bg-white/80 rounded-[2.5rem] shadow-2xl p-8 border-[12px] border-orange-50/50">
-            <h2 class="text-xl font-bold mb-6 text-orange-400 flex items-center gap-2">
-                <span class="text-2xl animate-pulse">🏢</span> マンションの様子
-            </h2>
-            <div id="apartment-grid" class="apartment-grid">
-                <!-- Mii cards will be injected here -->
-            </div>
-        </div>
-    </main>
-
-    <!-- News Ticker -->
-    <div class="news-ticker">
-        <div id="news-feed" class="news-content">
-            【島ニュース】今日も平和な一日が始まりました。新しい住人を募集中です！ ● 噴水広場に謎の物体が落ちていたそうです。 ● 住人の満足度が向上中！ ● 喫茶店で新作コーヒーが発売されました。 ● 
-        </div>
-    </div>
-</div>
-
-<!-- Create Mii Modal -->
-<div id="create-modal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center z-[200] p-4">
-    <div class="bg-white rounded-[2.5rem] p-8 max-w-md w-full shadow-2xl">
-        <h3 class="text-2xl font-bold mb-6 text-center text-gray-800">新しい住人を登録</h3>
-        <div class="space-y-5">
-            <div>
-                <label class="block text-sm font-bold text-gray-500 mb-1 ml-2">名前</label>
-                <input type="text" id="mii-name" maxlength="8" class="w-full border-2 border-gray-100 rounded-2xl px-5 py-3 focus:border-sky-400 outline-none bg-gray-50 transition-all" placeholder="名前を入力">
-            </div>
-            <div>
-                <label class="block text-sm font-bold text-gray-500 mb-2 ml-2">性別</label>
-                <div class="flex gap-3">
-                    <div class="gender-selector flex-1">
-                        <input type="radio" id="gender-male" name="mii-gender" value="male" class="hidden" checked>
-                        <label for="gender-male" class="block w-full text-center py-2 border-2 border-gray-100 rounded-xl font-bold text-gray-400 cursor-pointer transition-all">男</label>
-                    </div>
-                    <div class="gender-selector gender-selector-female flex-1">
-                        <input type="radio" id="gender-female" name="mii-gender" value="female" class="hidden">
-                        <label for="gender-female" class="block w-full text-center py-2 border-2 border-gray-100 rounded-xl font-bold text-gray-400 cursor-pointer transition-all">女</label>
-                    </div>
-                </div>
-            </div>
-            <div>
-                <label class="block text-sm font-bold text-gray-500 mb-1 ml-2">性格タイプ</label>
-                <select id="mii-personality" class="w-full border-2 border-gray-100 rounded-2xl px-5 py-3 bg-gray-50 focus:border-sky-400 outline-none font-bold">
-                    <option value="ナイス系">ナイス系 (温厚)</option>
-                    <option value="クール系">クール系 (知的)</option>
-                    <option value="ドライ系">ドライ系 (合理的)</option>
-                    <option value="アクティブ系">アクティブ系 (元気)</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-bold text-gray-500 mb-2 ml-2">好きな色</label>
-                <div class="flex justify-around bg-gray-50 p-3 rounded-2xl border-2 border-gray-50">
-                    <button onclick="setColor('#FFB6C1', this)" class="color-btn w-10 h-10 rounded-full bg-[#FFB6C1] border-4 border-white shadow-sm ring-4 ring-transparent transition-all"></button>
-                    <button onclick="setColor('#87CEFA', this)" class="color-btn w-10 h-10 rounded-full bg-[#87CEFA] border-4 border-white shadow-sm ring-4 ring-transparent transition-all"></button>
-                    <button onclick="setColor('#90EE90', this)" class="color-btn w-10 h-10 rounded-full bg-[#90EE90] border-4 border-white shadow-sm ring-4 ring-transparent transition-all"></button>
-                    <button onclick="setColor('#FFD700', this)" class="color-btn w-10 h-10 rounded-full bg-[#FFD700] border-4 border-white shadow-sm ring-4 ring-transparent transition-all"></button>
-                    <button onclick="setColor('#DDA0DD', this)" class="color-btn w-10 h-10 rounded-full bg-[#DDA0DD] border-4 border-white shadow-sm ring-4 ring-transparent transition-all"></button>
-                </div>
-                <input type="hidden" id="mii-color" value="#FFB6C1">
-            </div>
-            <div class="flex gap-4 mt-8">
-                <button onclick="closeModal('create-modal')" class="flex-1 py-4 rounded-2xl font-bold bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors">やめる</button>
-                <button onclick="saveMii()" class="flex-1 py-4 rounded-2xl font-bold bg-sky-500 text-white shadow-lg hover:bg-sky-600 active:scale-95 transition-all">登録！</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Mii Interaction Modal -->
-<div id="mii-modal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center z-[200] p-4">
-    <div id="mii-detail-content" class="bg-white rounded-[3rem] p-10 max-w-md w-full shadow-2xl transform transition-all border-[10px] border-sky-50">
-        <!-- Content will be dynamic -->
-    </div>
-</div>
-
-<script>
-    let residents = [];
-    
-    const maleEmojis = ['👦', '👨', '🧑', '👨‍🦱', '👨‍🦰', '🧔', '👴', '😎', '🙂'];
-    const femaleEmojis = ['👧', '👩', '🧑', '👩‍🦱', '👩‍🦰', '👱‍♀️', '👵', '😊', '🙂'];
-    
-    // 悩みと解決方法の定義
-    const troubles = [
-        { key: 'hunger', text: "お腹がぺこぺこなんです...。何か食べたいな。", solution: "feed", hint: "たべもの" },
-        { key: 'lonely', text: "誰かとお話ししたい気分です。遊んでくれますか？", solution: "play", hint: "あそぶ" },
-        { key: 'bored', text: "退屈だなあ。何か面白いことないかな？", solution: "play", hint: "あそぶ" },
-        { key: 'love', text: "あの子のことが気になって眠れません...。元気づけて！", solution: "play", hint: "あそぶ" },
-        { key: 'tired', text: "最近なんだか疲れ気味です。元気がつくものがいいな。", solution: "feed", hint: "たべもの" },
-        { key: 'dream', text: "自分の将来について悩んでいるんです。気分転換したいな。", solution: "play", hint: "あそぶ" }
-    ];
-
-    const newsQuotes = [
-        "広場で新しいダンスが流行しているようです。",
-        "【速報】美味しいお餅が発見されました。",
-        "住人の間で「空を飛びたい」という願いが急増中。",
-        "昨夜、謎の光が島の上空を通過しました。",
-        "新しい特産品として「レインボーキャンディ」が登録されました。",
-        "住人の一人が「伝説のドーナツ」を探しているという噂です。"
-    ];
-
-    function init() {
-        renderResidents();
-        startNewsCycle();
-        addInitialResident();
-    }
-
-    function addInitialResident() {
-        saveMiiData("トモ", "male", "ナイス系", "#87CEFA", '👦');
-    }
-
-    function openCreateModal() {
-        document.getElementById('create-modal').classList.remove('hidden');
-    }
-
-    function closeModal(id) {
-        document.getElementById(id).classList.add('hidden');
-    }
-
-    function setColor(color, btn) {
-        document.getElementById('mii-color').value = color;
-        document.querySelectorAll('.color-btn').forEach(b => b.style.borderColor = 'white');
-        btn.style.borderColor = '#38bdf8'; 
-    }
-
-    function saveMii() {
-        const name = document.getElementById('mii-name').value;
-        const gender = document.querySelector('input[name="mii-gender"]:checked').value;
-        const personality = document.getElementById('mii-personality').value;
-        const color = document.getElementById('mii-color').value;
-
-        if (!name) return;
-
-        saveMiiData(name, gender, personality, color);
-        closeModal('create-modal');
-        document.getElementById('mii-name').value = '';
-    }
-
-    function saveMiiData(name, gender, personality, color, specificEmoji = null) {
-        const emojiSet = gender === 'male' ? maleEmojis : femaleEmojis;
-        const newMii = {
-            id: Date.now() + Math.random(),
-            name: name,
-            gender: gender,
-            personality: personality,
-            color: color,
-            emoji: specificEmoji || emojiSet[Math.floor(Math.random() * emojiSet.length)],
-            level: 1,
-            happiness: 50,
-            hasTrouble: Math.random() > 0.4, // 初期状態から悩みがある確率
-            currentTrouble: troubles[Math.floor(Math.random() * troubles.length)],
-            thought: "今日は平和だなあ。"
-        };
-
-        residents.push(newMii);
-        renderResidents();
-    }
-
-    function renderResidents() {
-        const grid = document.getElementById('apartment-grid');
-        const countDisplay = document.getElementById('population-count');
-        grid.innerHTML = '';
-        countDisplay.innerText = residents.length;
-
-        residents.forEach(mii => {
-            const card = document.createElement('div');
-            card.className = 'relative mii-card bg-white rounded-2xl p-4 shadow-sm flex flex-col items-center justify-center border-b-4 border-gray-200 hover:shadow-lg transition-all';
-            card.onclick = () => openMiiInteraction(mii.id);
-            
-            card.innerHTML = `
-                ${mii.hasTrouble ? '<div class="status-bubble">?</div>' : ''}
-                <div class="mii-avatar" style="background-color: ${mii.color}">
-                    ${mii.emoji}
-                </div>
-                <p class="font-bold text-sm truncate w-full text-center text-gray-700">${mii.name}</p>
-                <div class="mt-1 flex items-center gap-1">
-                    <span class="level-badge">Lv.${mii.level}</span>
-                    <span class="text-[10px] ${mii.gender === 'male' ? 'text-blue-400' : 'text-pink-400'}">${mii.gender === 'male' ? '♂' : '♀'}</span>
-                </div>
-            `;
-            grid.appendChild(card);
-        });
-    }
-
-    function openMiiInteraction(id) {
-        const mii = residents.find(r => r.id === id);
-        if (!mii) return;
-
-        const content = document.getElementById('mii-detail-content');
-        const isTroubled = mii.hasTrouble;
-        const displayText = isTroubled ? mii.currentTrouble.text : mii.thought;
-        const genderColor = mii.gender === 'male' ? 'text-blue-500' : 'text-pink-500';
-        const genderIcon = mii.gender === 'male' ? '♂' : '♀';
-
-        // 悩みに適した解決方法を強調するクラス
-        const feedBtnHighlight = (isTroubled && mii.currentTrouble.solution === 'feed') ? 'ring-4 ring-orange-300 scale-105' : '';
-        const playBtnHighlight = (isTroubled && mii.currentTrouble.solution === 'play') ? 'ring-4 ring-green-300 scale-105' : '';
-
-        content.innerHTML = `
-            <div class="text-center celebration">
-                <div class="mii-avatar" style="background-color: ${mii.color}; width: 130px; height: 130px; font-size: 70px;">
-                    ${mii.emoji}
-                </div>
-                <div class="flex items-center justify-center gap-2 mt-4">
-                    <h3 class="text-2xl font-bold text-gray-800">${mii.name}</h3>
-                    <span class="${genderColor} text-xl font-bold">${genderIcon}</span>
-                </div>
-                <p class="text-sky-500 font-bold text-sm bg-sky-50 inline-block px-4 py-1 rounded-full mt-1">${mii.personality}</p>
-                
-                <div class="mt-8 p-6 ${isTroubled ? 'bg-orange-50 border-orange-200' : 'bg-sky-50 border-sky-100'} rounded-3xl border-2 shadow-inner relative">
-                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-white px-3 text-[10px] ${isTroubled ? 'text-orange-400' : 'text-sky-400'} font-bold uppercase tracking-widest">
-                        ${isTroubled ? '悩み事' : 'ひとこと'}
-                    </div>
-                    <p class="text-gray-700 leading-relaxed font-bold">「${displayText}」</p>
-                </div>
-
-                <div class="mt-10 grid grid-cols-2 gap-5">
-                    <button onclick="handleInteraction(${mii.id}, 'feed')" class="${feedBtnHighlight} group relative py-5 bg-orange-400 text-white rounded-3xl font-bold shadow-lg hover:bg-orange-500 transition-all active:scale-95">
-                        <span class="block group-hover:scale-125 transition-transform text-2xl mb-1">🍔</span>
-                        <span class="text-sm">たべもの</span>
-                        ${(isTroubled && mii.currentTrouble.solution === 'feed') ? '<span class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] px-2 py-1 rounded-full animate-pulse">解決！</span>' : ''}
-                    </button>
-                    <button onclick="handleInteraction(${mii.id}, 'play')" class="${playBtnHighlight} group relative py-5 bg-green-400 text-white rounded-3xl font-bold shadow-lg hover:bg-green-500 transition-all active:scale-95">
-                        <span class="block group-hover:scale-125 transition-transform text-2xl mb-1">🎮</span>
-                        <span class="text-sm">あそぶ</span>
-                        ${(isTroubled && mii.currentTrouble.solution === 'play') ? '<span class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] px-2 py-1 rounded-full animate-pulse">解決！</span>' : ''}
-                    </button>
-                </div>
-                
-                <button onclick="closeModal('mii-modal')" class="mt-8 text-gray-400 hover:text-gray-600 font-bold text-sm transition-colors hover:underline">
-                    あとでね
-                </button>
-            </div>
-        `;
-
-        document.getElementById('mii-modal').classList.remove('hidden');
-    }
-
-    function handleInteraction(id, type) {
-        const index = residents.findIndex(r => r.id === id);
-        if (index === -1) return;
-
-        const mii = residents[index];
-        const wasTroubled = mii.hasTrouble;
-        const solved = wasTroubled && mii.currentTrouble.solution === type;
-
-        // 状態更新
-        mii.level += 1;
-        mii.hasTrouble = false;
-        
-        let celebrationEmoji = "✨";
-        let successMsg = "満足しました！";
-        
-        if (solved) {
-            celebrationEmoji = "💖";
-            successMsg = "悩みが解決！";
-            mii.thought = "おかげさまでスッキリしました！ありがとうございます！";
-        } else if (type === 'feed') {
-            mii.thought = "ごちそうさまでした！おいしかったです。";
-            successMsg = "おいしかった！";
-        } else {
-            mii.thought = "楽しかったです！また遊んでくださいね。";
-            successMsg = "満足！";
-        }
-
-        renderResidents();
-        
-        const content = document.getElementById('mii-detail-content');
-        content.innerHTML = `
-            <div class="text-center celebration">
-                <div class="text-8xl mb-6 drop-shadow-lg animate-bounce">${celebrationEmoji}</div>
-                <h3 class="text-4xl font-bold text-orange-500 mb-2">${successMsg}</h3>
-                <p class="text-gray-600 font-bold text-lg">
-                    ${mii.name}の満足度が上がり、<br>
-                    レベルが <span class="text-3xl text-sky-500">Lv.${mii.level}</span> になりました！
-                </p>
-                <div class="mt-10 py-4 px-12 bg-sky-500 text-white rounded-full font-bold shadow-xl hover:bg-sky-600 transition-all active:scale-95 cursor-pointer inline-block" onclick="closeModal('mii-modal')">
-                    よかったね！
-                </div>
-            </div>
-        `;
-    }
-
-    function startNewsCycle() {
-        const feed = document.getElementById('news-feed');
-        setInterval(() => {
-            const randomQuote = newsQuotes[Math.floor(Math.random() * newsQuotes.length)];
-            feed.innerHTML += ` ● ${randomQuote}`;
-            
-            // 住人が悩みを抱える（より頻繁に発生するように調整）
-            if (residents.length > 0 && Math.random() > 0.6) {
-                const target = residents[Math.floor(Math.random() * residents.length)];
-                if (!target.hasTrouble) {
-                    target.hasTrouble = true;
-                    target.currentTrouble = troubles[Math.floor(Math.random() * troubles.length)];
-                    renderResidents();
-                }
-            }
-        }, 6000);
-    }
-
-    window.onload = init;
-</script>
-
-</body>
-</html>
