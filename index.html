@@ -3,83 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tomodachi Collection Web - Romance Update</title>
+    <title>トモダチコレクション Web - ライフゲーム</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (M PLUS Rounded 1c) -->
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'M PLUS Rounded 1c', sans-serif;
-            background: #f0f9ff;
+            background: #e0f2fe;
             color: #333;
-            overflow-x: hidden;
+            user-select: none;
         }
 
+        /* 島の背景アニメーション */
         .island-bg {
-            background: linear-gradient(180deg, #87CEEB 0%, #E0F2F1 100%);
+            background: linear-gradient(180deg, #7dd3fc 0%, #bae6fd 60%, #38bdf8 100%);
             min-height: 100vh;
         }
 
-        .mii-card {
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
-            aspect-ratio: 1 / 1;
+        /* アパートの立体感 */
+        .apartment-container {
+            background: #fef08a; /* クリームイエローのマンション */
+            border: 6px solid #eab308;
+            border-radius: 2rem;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
         }
 
-        .mii-card:hover {
+        .mii-room {
+            aspect-ratio: 1 / 1;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            background: #fef9c3;
+            border: 4px solid #fef08a;
+        }
+
+        .mii-room:hover {
             transform: scale(1.05);
+            border-color: #facc15;
             z-index: 10;
         }
 
-        .apartment-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 15px;
-            padding: 20px;
-        }
-
+        /* フワフワ浮かぶ悩みのバブル */
         .status-bubble {
             position: absolute;
-            top: -10px;
-            right: -10px;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
+            top: -6px;
+            right: -6px;
+            border-radius: 9999px;
+            width: 38px;
+            height: 38px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 20px;
-            font-weight: bold;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            animation: bounce 1s infinite alternate;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            animation: floatBubble 1.2s infinite alternate ease-in-out;
             border: 2px solid white;
             z-index: 20;
         }
-        
-        .bubble-trouble { background: #ff5f5f; color: white; }
-        .bubble-love { background: #f472b6; color: white; font-size: 18px; }
 
-        @keyframes bounce {
+        @keyframes floatBubble {
             0% { transform: translateY(0) scale(1); }
-            100% { transform: translateY(-10px) scale(1.1); }
+            100% { transform: translateY(-8px) scale(1.08); }
         }
 
+        /* トモコレ風ニューステッカー */
         .news-ticker {
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(15, 23, 42, 0.9);
             color: #fff;
-            padding: 12px;
+            padding: 8px 0;
             position: fixed;
             bottom: 0;
+            left: 0;
             width: 100%;
             white-space: nowrap;
             overflow: hidden;
-            z-index: 100;
-            border-top: 3px solid #ffcc00;
+            z-index: 40;
+            border-top: 4px solid #fbbf24;
         }
 
         .news-content {
             display: inline-block;
             padding-left: 100%;
-            animation: ticker 30s linear infinite;
+            animation: ticker 25s linear infinite;
         }
 
         @keyframes ticker {
@@ -88,37 +94,1020 @@
         }
 
         .modal-overlay {
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(8px);
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+<body class="island-bg flex flex-col min-h-screen">
+
+    <!-- ゲームUIヘッダー -->
+    <header class="bg-white/90 backdrop-blur border-b-4 border-sky-400 p-3 sticky top-0 z-30 shadow-md">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <div>
+                <h1 class="text-xl md:text-2xl font-bold text-sky-600 flex items-center gap-1">
+                    🏝️ トモダチコレクション <span class="text-orange-500 text-sm md:text-base">Lite</span>
+                </h1>
+                <p class="text-[10px] text-gray-500">Miiたちの生活をのぞいてお世話しよう！</p>
+            </div>
+            <!-- 所持金 & ゲーム進行度 -->
+            <div class="flex items-center gap-3">
+                <div class="bg-amber-100 border-2 border-amber-400 px-3 py-1 rounded-full text-sm font-bold text-amber-800 flex items-center gap-1">
+                    🪙 <span id="game-money">5000</span>円
+                </div>
+                <!-- 時間を進める疑似ボタン -->
+                <button onclick="advanceTime()" class="bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold px-3 py-2 rounded-xl shadow-md active:scale-95 transition-all">
+                    ⏰ 時間を進める
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- メインゲーム画面 -->
+    <main class="max-w-4xl w-full mx-auto p-4 flex-grow pb-24">
+        
+        <!-- アイランド・ビュー（ステータス） -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <!-- 島の統計 -->
+            <div class="bg-white/80 p-4 rounded-2xl border-2 border-sky-200 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-gray-500 font-bold">島の名前</p>
+                    <h2 class="text-lg font-bold text-sky-800">ピコピコ島 (じま)</h2>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs text-gray-500 font-bold">住人の数</p>
+                    <p class="text-lg font-bold text-sky-600"><span id="resident-count">0</span> / 12 人</p>
+                </div>
+            </div>
+
+            <!-- クイックアクション / ショップ -->
+            <div class="bg-white/80 p-4 rounded-2xl border-2 border-sky-200 shadow-sm flex items-center justify-around md:col-span-2">
+                <button onclick="openAddMiiModal()" class="flex flex-col items-center justify-center bg-orange-100 hover:bg-orange-200 text-orange-700 p-2 rounded-xl w-24 h-16 text-xs font-bold border border-orange-200 transition">
+                    <span class="text-xl">➕</span>
+                    Miiを作る
+                </button>
+                <button onclick="openShopModal()" class="flex flex-col items-center justify-center bg-amber-100 hover:bg-amber-200 text-amber-700 p-2 rounded-xl w-24 h-16 text-xs font-bold border border-amber-200 transition">
+                    <span class="text-xl">🛒</span>
+                    ショップ
+                </button>
+                <button onclick="openRelationshipsModal()" class="flex flex-col items-center justify-center bg-pink-100 hover:bg-pink-200 text-pink-700 p-2 rounded-xl w-24 h-16 text-xs font-bold border border-pink-200 transition">
+                    <span class="text-xl">👥</span>
+                    相関図
+                </button>
+            </div>
+        </div>
+
+        <!-- マンションエリア -->
+        <div class="apartment-container p-4 md:p-6 mb-4">
+            <div class="text-center mb-4">
+                <span class="bg-yellow-500 text-white font-bold text-xs px-4 py-1.5 rounded-full shadow-sm">
+                    🏢 ピーチヒルズマンション
+                </span>
+            </div>
+            <!-- 12個の部屋 (3x4グリッド) -->
+            <div id="apartment-grid" class="grid grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
+                <!-- JSで12部屋を固定生成。空室なら「空き部屋」、住人がいればMiiが表示される -->
+            </div>
+        </div>
+
+        <!-- チュートリアル・ミニヘルプ -->
+        <div class="bg-white/60 rounded-xl p-3 border border-sky-100 text-center text-xs text-sky-800">
+            💡 <span class="font-bold">遊び方:</span> 部屋をタップしてお世話しよう！お腹が空いたらショップで食べ物を買ってプレゼント。たまに発生する恋の悩みは告白を応援して解決！
+        </div>
+
+    </main>
+
+    <!-- ニューステッカー -->
+    <div class="news-ticker">
+        <div id="news-content" class="news-content text-xs md:text-sm tracking-widest font-bold">
+            【ピコピコ島 ニュース】今日も平和な一日が始まります。島民たちの様子を観察してみましょう！
+        </div>
+    </div>
+
+    <!-- Mii作成モーダル -->
+    <div id="add-mii-modal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border-4 border-orange-400 transition-all">
+            <h3 class="text-lg font-bold text-center text-orange-600 mb-4">🆕 新しいMiiの登録</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">なまえ</label>
+                    <input type="text" id="new-mii-name" placeholder="例: たかし" maxlength="8" class="w-full px-3 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-orange-400 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">せいべつ</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button id="gender-male" onclick="setGender('male')" class="py-2 bg-sky-100 hover:bg-sky-200 border-2 border-sky-400 text-sky-800 font-bold rounded-xl text-xs transition">👦 おとこのこ</button>
+                        <button id="gender-female" onclick="setGender('female')" class="py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 text-gray-600 font-bold rounded-xl text-xs transition">👧 おんなのこ</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">見た目（アバター）</label>
+                    <div class="grid grid-cols-5 gap-2 text-2xl bg-gray-50 p-2 rounded-xl" id="avatar-selector">
+                        <!-- JSで絵文字候補を注入 -->
+                    </div>
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button onclick="closeAddMiiModal()" class="w-1/2 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-2 rounded-xl text-xs transition">やめる</button>
+                    <button onclick="createMii()" class="w-1/2 bg-gradient-to-r from-orange-400 to-amber-400 hover:from-orange-500 hover:to-amber-500 text-white font-bold py-2 rounded-xl text-xs transition shadow-md">島に住まわせる</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ショップモーダル -->
+    <div id="shop-modal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border-4 border-amber-400">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-amber-600 flex items-center gap-1">🛒 フード＆アイテムショップ</h3>
+                <span class="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded-lg font-bold">財布: <span id="shop-money">5000</span>円</span>
+            </div>
+            
+            <div class="space-y-3 max-h-72 overflow-y-auto pr-1" id="shop-items-container">
+                <!-- ショップアイテムがJSで注入されます -->
+            </div>
+
+            <div class="flex justify-end mt-4">
+                <button onclick="closeShopModal()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold px-5 py-2 rounded-xl text-xs transition">店を出る</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mii個別お世話モーダル -->
+    <div id="mii-detail-modal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl border-4 border-sky-400 relative">
+            <!-- 個別背景（部屋の壁紙風） -->
+            <div class="absolute top-0 left-0 right-0 h-24 bg-gradient-to-r from-sky-200 to-indigo-100 rounded-t-[24px] -z-10"></div>
+            
+            <div id="detail-avatar" class="w-20 h-20 rounded-full border-4 border-white shadow-md bg-white flex items-center justify-center text-4xl mx-auto mt-2 mb-2">😊</div>
+            
+            <h3 id="detail-name" class="text-xl font-bold text-gray-800">たかし</h3>
+            <div class="flex justify-center gap-2 my-1">
+                <span id="detail-gender" class="text-xs font-bold text-sky-600 bg-sky-50 px-2.5 py-0.5 rounded-full">👦 おとこのこ</span>
+                <span id="detail-level" class="text-xs font-bold text-amber-700 bg-amber-100 px-2.5 py-0.5 rounded-full">Lv.1</span>
+            </div>
+
+            <!-- ステータスバー（満腹度 & ハッピー度） -->
+            <div class="my-3 bg-gray-50 rounded-2xl p-3 border border-gray-100 space-y-2">
+                <div>
+                    <div class="flex justify-between text-[11px] font-bold text-gray-500 mb-0.5">
+                        <span>🍔 おなか（満腹度）</span>
+                        <span id="detail-hunger-text">50%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 h-2.5 rounded-full overflow-hidden">
+                        <div id="detail-hunger-bar" class="bg-emerald-500 h-full transition-all" style="width: 50%;"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-[11px] font-bold text-gray-500 mb-0.5">
+                        <span>❤️ なかよし度</span>
+                        <span id="detail-happy-text">20%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 h-2.5 rounded-full overflow-hidden">
+                        <div id="detail-happy-bar" class="bg-pink-500 h-full transition-all" style="width: 20%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 吹き出しセリフ -->
+            <div class="bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-3 my-3 text-xs text-gray-700 min-h-[50px] flex items-center justify-center relative">
+                <div class="absolute -top-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-b-8 border-b-yellow-200"></div>
+                <p id="detail-speech">お腹すいたなぁ…</p>
+            </div>
+
+            <!-- アクションエリア -->
+            <div class="space-y-2 pt-2" id="detail-actions">
+                <!-- 状況に応じてボタンが変化 -->
+            </div>
+
+            <button onclick="closeMiiDetailModal()" class="mt-4 text-xs text-gray-400 hover:text-gray-600 underline">とじる</button>
+        </div>
+    </div>
+
+    <!-- お世話アイテム選択（ポケット）モーダル -->
+    <div id="pocket-modal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl p-5 max-w-sm w-full shadow-2xl border-4 border-indigo-400">
+            <h3 class="text-base font-bold text-indigo-800 mb-3 text-center">🎒 なにをプレゼントする？</h3>
+            <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-1" id="pocket-items-list">
+                <!-- 手持ちのアイテム一覧 -->
+            </div>
+            <button onclick="closePocketModal()" class="w-full mt-3 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-2 rounded-xl text-xs transition">やめる</button>
+        </div>
+    </div>
+
+    <!-- 相関図（人間関係）モーダル -->
+    <div id="relationships-modal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border-4 border-pink-400">
+            <h3 class="text-lg font-bold text-pink-600 text-center mb-4">👥 島民みんなの人間関係</h3>
+            <div class="space-y-2 max-h-64 overflow-y-auto pr-1" id="relationships-list">
+                <!-- 人間関係がリスト表示されます -->
+            </div>
+            <div class="flex justify-end mt-4">
+                <button onclick="closeRelationshipsModal()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-5 py-2 rounded-xl text-xs transition">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- イベントアニメーション・ドラマ演出モーダル -->
+    <div id="event-modal" class="hidden fixed inset-0 bg-black/85 flex flex-col items-center justify-center p-4 z-50">
+        <div class="text-center space-y-6 max-w-md w-full">
+            <h2 id="event-title" class="text-2xl md:text-3xl font-extrabold text-yellow-300 tracking-wider animate-bounce">💘 告白タイム！</h2>
+            
+            <!-- ドラマチックステージ -->
+            <div class="bg-gradient-to-b from-purple-900 to-indigo-950 border-4 border-pink-500 rounded-3xl p-6 relative overflow-hidden shadow-2xl h-64 flex items-center justify-around">
+                <!-- 背景きらきら -->
+                <div class="absolute inset-0 opacity-10 bg-[radial-gradient(circle,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
+                
+                <!-- 告白する側 -->
+                <div class="text-center z-10">
+                    <div id="event-actor-emoji" class="text-6xl animate-pulse">👦</div>
+                    <p id="event-actor-name" class="text-white font-bold mt-2 text-sm bg-black/40 px-2 py-0.5 rounded-full">たかし</p>
+                </div>
+
+                <!-- ハート・対決マーク -->
+                <div class="text-center z-10">
+                    <div id="event-heart" class="text-4xl animate-bounce">💖</div>
+                </div>
+
+                <!-- 告白される側 -->
+                <div class="text-center z-10">
+                    <div id="event-target-emoji" class="text-6xl">👧</div>
+                    <p id="event-target-name" class="text-white font-bold mt-2 text-sm bg-black/40 px-2 py-0.5 rounded-full">さくら</p>
+                </div>
+            </div>
+
+            <!-- イベントセリフ吹き出し -->
+            <div class="bg-white rounded-2xl p-4 shadow-xl border-2 border-indigo-400">
+                <p id="event-speech" class="text-gray-800 font-bold text-sm md:text-base">「ずっと前から好きでした！付き合ってください！」</p>
+            </div>
+
+            <!-- 進むボタン -->
+            <div class="flex justify-center">
+                <button id="event-next-btn" class="bg-pink-500 hover:bg-pink-600 text-white text-base font-bold px-8 py-3 rounded-full shadow-lg active:scale-95 transition-all animate-pulse">
+                    ドキドキしながら見守る…！
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ゲームロジック -->
+    <script>
+        // --- 1. グローバルゲーム状態 ---
+        let game = {
+            money: 3500,
+            residents: [],
+            pocket: {
+                "bread": 2,      // パン（初期所持）
+                "water": 1       // ミネラルウォーター（初期所持）
+            }
+        };
+
+        const MAX_RESIDENTS = 12;
+
+        // 性別ごとの初期アバター候補
+        const maleEmojis = ["👦", "👨", "😎", "🦊", "🦁", "👽", "🤖", "🤠"];
+        const femaleEmojis = ["👧", "👩", "🐱", "🐰", "🐼", "🦄", "💖", "👸"];
+        let currentSelectedGender = 'male';
+        let currentSelectedEmoji = '👦';
+
+        // --- 2. アイテムマスタ ---
+        const ITEM_SHOP = {
+            "bread": { name: "安売りのパン", emoji: "🍞", price: 100, hunger: 25, happy: 5, desc: "素朴だけどおいしいパン。" },
+            "water": { name: "湧き水ウォーター", emoji: "💧", price: 50, hunger: 10, happy: 5, desc: "島の綺麗な湧き水。" },
+            "curry": { name: "大盛りカレー", emoji: "🍛", price: 450, hunger: 60, happy: 15, desc: "スパイスのきいた特製カレー。" },
+            "steak": { name: "極上ステーキ", emoji: "🥩", price: 1200, hunger: 100, happy: 35, desc: "超高級な霜降りお肉！" },
+            "game": { name: "レトロゲーム機", emoji: "🎮", price: 2000, hunger: 0, happy: 80, desc: "一気に仲良くなれるゲーム機。" }
+        };
+
+        // --- 3. セリフマスタ ---
+        const STATUS_SPEECHES = {
+            none: [
+                "今日も島は平和だねぇ。のんびり〜。",
+                "新しいお友達がもっと増えるといいな！",
+                "ゲームをしたり、本を読んだり。自由気ままだよ。",
+                "窓の外をながめると、海がキラキラしてきれいです。",
+                "お腹もいっぱいだし、幸せだなぁ。"
+            ],
+            hunger: [
+                "お腹がすきすぎて力が出ないよお…🍔",
+                "グゥ〜…（お腹の音）。何か食べるものないかな？",
+                "食べ物のことばかり考えて頭がいっぱいだぁ…！",
+                "冷蔵庫を開けたけど、何も入ってなかった…"
+            ],
+            love: [
+                "実はね…好きな人ができちゃったんだ。あわわ…💖",
+                "となりの部屋の人が気になって夜も眠れません！",
+                "あの人と目が合うだけで、ドキドキしちゃうんだ。"
+            ],
+            fight: [
+                "さっき島民とケンカしちゃって、すごくモヤモヤする！💥",
+                "なんだかイライラする…一人にしてほしいかも。"
+            ]
+        };
+
+        // ランダムな名前ジェネレータ
+        const randomNamesMale = ["たかし", "じゅん", "けん", "ひろし", "しょう", "しんご", "トシ", "ジミー"];
+        const randomNamesFemale = ["さくら", "あい", "ゆい", "めぐみ", "みさと", "ハナ", "エミリー", "アンナ"];
+
+        // 初期住民のセット
+        const initialResidents = [
+            {
+                id: 1,
+                name: "たかし",
+                gender: "male",
+                emoji: "👦",
+                level: 3,
+                hunger: 60,  // 0-100 (100で満腹)
+                happy: 40,   // 0-100 (100でMAX)
+                status: "love", // none, hunger, love, fight
+                statusTargetId: 2, // 告白・喧嘩の相手
+                statusText: "さくらさんに想いを伝えたい…！応援してくれますか？",
+                relationships: { 2: "片思い" }
+            },
+            {
+                id: 2,
+                name: "さくら",
+                gender: "female",
+                emoji: "👧",
+                level: 5,
+                hunger: 30, // お腹がすいている
+                happy: 35,
+                status: "hunger",
+                statusTargetId: null,
+                statusText: "お腹がぺこぺこです…何か分けてくれませんか？",
+                relationships: { 1: "友達" }
+            },
+            {
+                id: 3,
+                name: "じゅん",
+                gender: "male",
+                emoji: "😎",
+                level: 1,
+                hunger: 80,
+                happy: 70,
+                status: "none",
+                statusTargetId: null,
+                statusText: "この島、最高にクールだぜ！イェーイ！",
+                relationships: {}
+            }
+        ];
+
+        // --- 4. 初期化処理 ---
+        window.onload = function() {
+            // ローカルストレージがあれば復元（なければ初期データ）
+            const savedGame = localStorage.getItem("tomodachi_collection_web_save");
+            if (savedGame) {
+                try {
+                    game = JSON.parse(savedGame);
+                } catch(e) {
+                    game.residents = [...initialResidents];
+                }
+            } else {
+                game.residents = [...initialResidents];
+            }
+            
+            updateTopUI();
+            renderApartment();
+        };
+
+        // --- 5. UI更新 ---
+        function updateTopUI() {
+            document.getElementById("game-money").innerText = game.money;
+            document.getElementById("resident-count").innerText = game.residents.length;
+            // ローカルストレージセーブ
+            localStorage.setItem("tomodachi_collection_web_save", JSON.stringify(game));
         }
 
-        .mii-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 44px;
-            margin: 0 auto 10px;
-            border: 5px solid #fff;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        // 12個のアパートをレンダリング
+        function renderApartment() {
+            const grid = document.getElementById("apartment-grid");
+            grid.innerHTML = "";
+
+            // 12部屋固定（1〜12号室）
+            for (let roomNo = 1; roomNo <= MAX_RESIDENTS; roomNo++) {
+                const mii = game.residents[roomNo - 1]; // 部屋番号に対応する住民
+
+                const roomDiv = document.createElement("div");
+                
+                if (mii) {
+                    // 住人がいる部屋
+                    roomDiv.className = "mii-room relative rounded-2xl flex flex-col items-center justify-center p-3 shadow-md bg-white";
+                    roomDiv.onclick = () => openMiiDetailModal(mii.id);
+
+                    // ステータスバブルの表示判定
+                    let bubbleHtml = '';
+                    if (mii.status === 'hunger') {
+                        bubbleHtml = `<div class="status-bubble bg-purple-500 text-white text-xs font-bold border-2 border-white">🥤</div>`;
+                    } else if (mii.status === 'love') {
+                        bubbleHtml = `<div class="status-bubble bg-pink-500 text-white text-xs font-bold border-2 border-white">💘</div>`;
+                    } else if (mii.status === 'fight') {
+                        bubbleHtml = `<div class="status-bubble bg-red-500 text-white text-xs font-bold border-2 border-white">💢</div>`;
+                    }
+
+                    roomDiv.innerHTML = `
+                        ${bubbleHtml}
+                        <div class="text-4xl mb-1">${mii.emoji}</div>
+                        <div class="text-xs font-bold text-gray-700 truncate w-full text-center">${mii.name}</div>
+                        <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-1.5 py-0.5 rounded-full mt-1">Lv.${mii.level}</span>
+                    `;
+                } else {
+                    // 空き部屋
+                    roomDiv.className = "border-4 border-dashed border-sky-300 rounded-2xl flex flex-col items-center justify-center p-3 bg-sky-50/50 hover:bg-sky-100/70 transition cursor-pointer";
+                    roomDiv.onclick = () => openAddMiiModal();
+                    roomDiv.innerHTML = `
+                        <div class="text-2xl text-sky-400 font-bold mb-1">🚪</div>
+                        <div class="text-[10px] font-bold text-sky-500">空き部屋</div>
+                        <div class="text-[8px] text-sky-400 mt-1">タップで作成</div>
+                    `;
+                }
+                grid.appendChild(roomDiv);
+            }
         }
 
-        .level-badge {
-            background: #ffd700;
-            color: #8b4513;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 10px;
-            font-weight: bold;
+        // --- 6. Mii作成処理 ---
+        function openAddMiiModal() {
+            if (game.residents.length >= MAX_RESIDENTS) {
+                alert("マンションが満室です！新しい部屋を作ることはできません。");
+                return;
+            }
+            document.getElementById("add-mii-modal").classList.remove("hidden");
+            // ランダムで名前を入れてあげる
+            setGender('male');
         }
 
-        .gender-selector input:checked + label {
-            background-color: #38bdf8;
-            color: white;
-            border-color: #3
+        function closeAddMiiModal() {
+            document.getElementById("add-mii-modal").classList.add("hidden");
+        }
 
+        function setGender(gender) {
+            currentSelectedGender = gender;
+            const maleBtn = document.getElementById("gender-male");
+            const femaleBtn = document.getElementById("gender-female");
+            const selector = document.getElementById("avatar-selector");
+            const nameInput = document.getElementById("new-mii-name");
 
+            selector.innerHTML = "";
 
+            if (gender === 'male') {
+                maleBtn.className = "py-2 bg-sky-500 text-white font-bold rounded-xl text-xs transition border-2 border-sky-400";
+                femaleBtn.className = "py-2 bg-gray-100 text-gray-600 font-bold rounded-xl text-xs transition border border-gray-300";
+                
+                // 男の子用アバター候補
+                maleEmojis.forEach(emoji => {
+                    const btn = document.createElement("button");
+                    btn.innerText = emoji;
+                    btn.className = "hover:scale-125 transition p-1";
+                    btn.onclick = () => selectEmoji(emoji, btn);
+                    selector.appendChild(btn);
+                });
+                selectEmoji(maleEmojis[0], selector.firstChild);
+                nameInput.value = randomNamesMale[Math.floor(Math.random() * randomNamesMale.length)];
+            } else {
+                femaleBtn.className = "py-2 bg-pink-500 text-white font-bold rounded-xl text-xs transition border-2 border-pink-400";
+                maleBtn.className = "py-2 bg-gray-100 text-gray-600 font-bold rounded-xl text-xs transition border border-gray-300";
+                
+                // 女の子用アバター候補
+                femaleEmojis.forEach(emoji => {
+                    const btn = document.createElement("button");
+                    btn.innerText = emoji;
+                    btn.className = "hover:scale-125 transition p-1";
+                    btn.onclick = () => selectEmoji(emoji, btn);
+                    selector.appendChild(btn);
+                });
+                selectEmoji(femaleEmojis[0], selector.firstChild);
+                nameInput.value = randomNamesFemale[Math.floor(Math.random() * randomNamesFemale.length)];
+            }
+        }
 
+        function selectEmoji(emoji, element) {
+            currentSelectedEmoji = emoji;
+            // 選択スタイルを一旦リセット
+            const buttons = document.getElementById("avatar-selector").children;
+            for (let b of buttons) {
+                b.classList.remove("border-2", "border-orange-500", "bg-white", "rounded-lg");
+            }
+            if (element) {
+                element.classList.add("border-2", "border-orange-500", "bg-white", "rounded-lg");
+            }
+        }
+
+        function createMii() {
+            const nameInput = document.getElementById("new-mii-name");
+            const name = nameInput.value.trim();
+
+            if (!name) {
+                alert("Miiの名前を決めてください！");
+                return;
+            }
+
+            // Miiの生成
+            const newMii = {
+                id: Date.now() + Math.floor(Math.random() * 100),
+                name: name,
+                gender: currentSelectedGender,
+                emoji: currentSelectedEmoji,
+                level: 1,
+                hunger: 70,
+                happy: 30,
+                status: "none",
+                statusTargetId: null,
+                statusText: "今日からこの島に住むことになりました！よろしくお願いします！",
+                relationships: {}
+            };
+
+            game.residents.push(newMii);
+            
+            // ニューステッカーに流す
+            addNews(`【祝】新しい島民「${name}」さんが入居しました！歓迎しましょう！`);
+
+            closeAddMiiModal();
+            updateTopUI();
+            renderApartment();
+        }
+
+        // --- 7. 個別お世話モーダル ---
+        let currentActiveMiiId = null;
+
+        function openMiiDetailModal(id) {
+            currentActiveMiiId = id;
+            const mii = game.residents.find(m => m.id === id);
+            if (!mii) return;
+
+            document.getElementById("detail-avatar").innerText = mii.emoji;
+            document.getElementById("detail-name").innerText = mii.name;
+            
+            const genderText = mii.gender === 'male' ? "👦 おとこのこ" : "👧 おんなのこ";
+            document.getElementById("detail-gender").innerText = genderText;
+            document.getElementById("detail-gender").className = mii.gender === 'male' 
+                ? "text-[10px] font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full" 
+                : "text-[10px] font-bold text-pink-600 bg-pink-50 px-2 py-0.5 rounded-full";
+
+            document.getElementById("detail-level").innerText = `Lv.${mii.level}`;
+
+            // ステータスバー反映
+            document.getElementById("detail-hunger-text").innerText = `${mii.hunger}%`;
+            document.getElementById("detail-hunger-bar").style.width = `${mii.hunger}%`;
+            
+            document.getElementById("detail-happy-text").innerText = `${mii.happy}%`;
+            document.getElementById("detail-happy-bar").style.width = `${mii.happy}%`;
+
+            // セリフ表示
+            document.getElementById("detail-speech").innerText = mii.statusText || "のんびり過ごしているよ。";
+
+            // アクションボタンの構築
+            const actionsDiv = document.getElementById("detail-actions");
+            actionsDiv.innerHTML = "";
+
+            if (mii.status === "love") {
+                // 恋愛イベント発生中
+                const targetMii = game.residents.find(m => m.id === mii.statusTargetId);
+                const targetName = targetMii ? targetMii.name : "誰か";
+                
+                const btnLove = document.createElement("button");
+                btnLove.className = "w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow transition-all active:scale-95 flex items-center justify-center gap-1";
+                btnLove.innerHTML = `💓 ${targetName}さんへの告白をプロデュースする！`;
+                btnLove.onclick = () => triggerLoveEvent(mii, targetMii);
+                actionsDiv.appendChild(btnLove);
+
+            } else if (mii.status === "fight") {
+                // ケンカイベント発生中
+                const targetMii = game.residents.find(m => m.id === mii.statusTargetId);
+                const targetName = targetMii ? targetMii.name : "誰か";
+
+                const btnResolveFight = document.createElement("button");
+                btnResolveFight.className = "w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 px-4 rounded-xl text-xs shadow transition-all active:scale-95";
+                btnResolveFight.innerText = `💥 ${targetName}と仲直りさせる`;
+                btnResolveFight.onclick = () => resolveFight(mii, targetMii);
+                actionsDiv.appendChild(btnResolveFight);
+
+            } else {
+                // 通常状態
+                // プレゼントをあげる
+                const btnPresent = document.createElement("button");
+                btnPresent.className = "w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-xl text-xs shadow transition-all active:scale-95";
+                btnPresent.innerText = "🎒 プレゼントをあげる";
+                btnPresent.onclick = () => openPocketModal();
+                actionsDiv.appendChild(btnPresent);
+
+                // なでなでする（ハッピー度少しUP）
+                const btnStroke = document.createElement("button");
+                btnStroke.className = "w-full bg-amber-400 hover:bg-amber-500 text-white font-bold py-2 px-4 rounded-xl text-xs shadow transition-all active:scale-95";
+                btnStroke.innerText = "👋 話を聞いてあげる（ハッピー度+10）";
+                btnStroke.onclick = () => strokeMii(mii);
+                actionsDiv.appendChild(btnStroke);
+            }
+
+            // お別れする（削除）ボタンも一応搭載
+            const btnKick = document.createElement("button");
+            btnKick.className = "w-full text-red-400 hover:text-red-500 text-[10px] pt-1 block text-center transition";
+            btnKick.innerText = "❌ 島の外へお引っ越しさせる";
+            btnKick.onclick = () => kickMii(mii);
+            actionsDiv.appendChild(btnKick);
+
+            document.getElementById("mii-detail-modal").classList.remove("hidden");
+        }
+
+        function closeMiiDetailModal() {
+            document.getElementById("mii-detail-modal").classList.add("hidden");
+        }
+
+        // --- 8. プレゼントシステム ---
+        function openPocketModal() {
+            const modal = document.getElementById("pocket-modal");
+            const list = document.getElementById("pocket-items-list");
+            list.innerHTML = "";
+
+            let hasItems = false;
+            for (let [itemKey, qty] of Object.entries(game.pocket)) {
+                if (qty > 0) {
+                    hasItems = true;
+                    const itemData = ITEM_SHOP[itemKey];
+                    const itemBtn = document.createElement("button");
+                    itemBtn.className = "bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 p-2 rounded-xl flex flex-col items-center text-center transition active:scale-95";
+                    itemBtn.onclick = () => givePresent(itemKey);
+                    itemBtn.innerHTML = `
+                        <span class="text-2xl">${itemData.emoji}</span>
+                        <span class="text-[10px] font-bold text-gray-700 mt-1 truncate w-full">${itemData.name}</span>
+                        <span class="text-[9px] text-indigo-600 font-bold bg-white px-2 py-0.5 rounded-full mt-0.5">残り: ${qty}個</span>
+                    `;
+                    list.appendChild(itemBtn);
+                }
+            }
+
+            if (!hasItems) {
+                list.innerHTML = `<p class="col-span-2 text-center text-xs text-gray-400 py-4">お世話用のアイテムをまだ持っていません。ショップで買いましょう！</p>`;
+            }
+
+            modal.classList.remove("hidden");
+        }
+
+        function closePocketModal() {
+            document.getElementById("pocket-modal").classList.add("hidden");
+        }
+
+        function givePresent(itemKey) {
+            if (!currentActiveMiiId) return;
+            const mii = game.residents.find(m => m.id === currentActiveMiiId);
+            if (!mii) return;
+
+            if (!game.pocket[itemKey] || game.pocket[itemKey] <= 0) {
+                alert("アイテムがありません。");
+                return;
+            }
+
+            const itemData = ITEM_SHOP[itemKey];
+
+            // 消費
+            game.pocket[itemKey]--;
+
+            // Miiのステータス変化
+            mii.hunger = Math.min(100, mii.hunger + itemData.hunger);
+            mii.happy = Math.min(100, mii.happy + itemData.happy);
+
+            // レベルアップ判定
+            let leveledUp = false;
+            if (mii.happy >= 100) {
+                mii.level++;
+                mii.happy = 20; // 次のレベル用リセット
+                leveledUp = true;
+                game.money += 500; // レベルアップボーナス
+            }
+
+            // 満腹・お悩みのチェック解除
+            if (mii.status === 'hunger' && mii.hunger > 50) {
+                mii.status = 'none';
+                mii.statusText = "お腹がいっぱいになりました！本当にありがとう！";
+            } else {
+                mii.statusText = `${itemData.name}をもらいました！美味しい〜！`;
+            }
+
+            alert(`${mii.name}に ${itemData.emoji}${itemData.name} をプレゼントしました！\n${leveledUp ? '🎉 なかよしレベルがアップしました！' : ''}`);
+
+            closePocketModal();
+            closeMiiDetailModal();
+            updateTopUI();
+            renderApartment();
+        }
+
+        // --- 9. なでなで / コミット ---
+        function strokeMii(mii) {
+            mii.happy = Math.min(100, mii.happy + 15);
+            
+            let leveledUp = false;
+            if (mii.happy >= 100) {
+                mii.level++;
+                mii.happy = 15;
+                leveledUp = true;
+                game.money += 500;
+            }
+
+            mii.statusText = "うんうん、話を聞いてくれてスッキリしたよ！";
+            alert(`${mii.name}のお悩み相談をして、仲良くなりました！\n${leveledUp ? '🎉 なかよしレベルがアップしました！' : ''}`);
+
+            closeMiiDetailModal();
+            updateTopUI();
+            renderApartment();
+        }
+
+        // お引っ越し（Miiの削除）
+        function kickMii(mii) {
+            const conf = confirm(`本当に ${mii.name} さんを島から引っ越させますか？（これまでの記録は消えてしまいます）`);
+            if (conf) {
+                game.residents = game.residents.filter(m => m.id !== mii.id);
+                // 人間関係から削除された人のキーも消去
+                game.residents.forEach(m => {
+                    if (m.relationships[mii.id]) {
+                        delete m.relationships[mii.id];
+                    }
+                    if (m.statusTargetId === mii.id) {
+                        m.status = 'none';
+                        m.statusTargetId = null;
+                        m.statusText = "のんびり過ごしているよ。";
+                    }
+                });
+
+                addNews(`【速報】${mii.name}さんが島を出発し、新しい旅に出かけました。`);
+                closeMiiDetailModal();
+                updateTopUI();
+                renderApartment();
+            }
+        }
+
+        // --- 10. ショップロジック ---
+        function openShopModal() {
+            document.getElementById("shop-money").innerText = game.money;
+            const container = document.getElementById("shop-items-container");
+            container.innerHTML = "";
+
+            for (let [itemKey, item] of Object.entries(ITEM_SHOP)) {
+                const itemDiv = document.createElement("div");
+                itemDiv.className = "flex justify-between items-center bg-gray-50 border border-gray-100 p-3 rounded-2xl";
+                
+                // 所持数のカウント
+                const ownedQty = game.pocket[itemKey] || 0;
+
+                itemDiv.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="text-3xl">${item.emoji}</div>
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800">${item.name}</h4>
+                            <p class="text-[10px] text-gray-400">${item.desc}</p>
+                            <span class="text-[9px] bg-slate-200 px-1.5 py-0.5 rounded-full font-bold">手持ち: ${ownedQty}個</span>
+                        </div>
+                    </div>
+                    <button onclick="buyItem('${itemKey}')" class="bg-amber-400 hover:bg-amber-500 text-amber-950 font-bold px-3 py-1.5 rounded-xl text-xs shadow-sm transition active:scale-95 flex items-center gap-1">
+                        🪙 ${item.price}円
+                    </button>
+                `;
+                container.appendChild(itemDiv);
+            }
+
+            document.getElementById("shop-modal").classList.remove("hidden");
+        }
+
+        function closeShopModal() {
+            document.getElementById("shop-modal").classList.add("hidden");
+        }
+
+        function buyItem(itemKey) {
+            const item = ITEM_SHOP[itemKey];
+            if (game.money < item.price) {
+                alert("お金が足りません！Miiたちの願いを叶えたり時間を進めて稼ぎましょう。");
+                return;
+            }
+
+            game.money -= item.price;
+            game.pocket[itemKey] = (game.pocket[itemKey] || 0) + 1;
+
+            alert(`${item.emoji}${item.name} を1つ購入しました！`);
+            
+            // 画面更新
+            document.getElementById("shop-money").innerText = game.money;
+            openShopModal(); // 再描画
+            updateTopUI();
+        }
+
+        // --- 11. 人間関係モーダル ---
+        function openRelationshipsModal() {
+            const container = document.getElementById("relationships-list");
+            container.innerHTML = "";
+
+            let hasRel = false;
+            game.residents.forEach(mii => {
+                for (let [targetId, status] of Object.entries(mii.relationships)) {
+                    const target = game.residents.find(m => m.id === parseInt(targetId));
+                    if (target) {
+                        hasRel = true;
+                        const relDiv = document.createElement("div");
+                        relDiv.className = "flex items-center justify-between bg-pink-50/50 border border-pink-100 p-2 rounded-xl text-xs";
+                        
+                        let badgeColor = "bg-gray-200 text-gray-700";
+                        if (status === "恋人") badgeColor = "bg-rose-500 text-white animate-pulse";
+                        if (status === "片思い") badgeColor = "bg-pink-400 text-white";
+                        if (status === "ケンカ中") badgeColor = "bg-red-500 text-white";
+
+                        relDiv.innerHTML = `
+                            <div class="flex items-center gap-2">
+                                <span class="text-xl">${mii.emoji}</span>
+                                <span class="font-bold">${mii.name}</span>
+                            </div>
+                            <div class="text-[10px] px-3 py-1 rounded-full font-bold ${badgeColor}">
+                                ${status}
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold">${target.name}</span>
+                                <span class="text-xl">${target.emoji}</span>
+                            </div>
+                        `;
+                        container.appendChild(relDiv);
+                    }
+                }
+            });
+
+            if (!hasRel) {
+                container.innerHTML = `<p class="text-center text-xs text-gray-400 py-8">まだ島民たちの間に目立った人間関係はありません。\nお悩み解決や時間経過でイベントが起きます！</p>`;
+            }
+
+            document.getElementById("relationships-modal").classList.remove("hidden");
+        }
+
+        function closeRelationshipsModal() {
+            document.getElementById("relationships-modal").classList.add("hidden");
+        }
+
+        // --- 12. イベントアニメーション & 告白イベント ---
+        let currentEventStep = 0;
+        let eventActor = null;
+        let eventTarget = null;
+
+        function triggerLoveEvent(actor, target) {
+            closeMiiDetailModal();
+            eventActor = actor;
+            eventTarget = target;
+            currentEventStep = 0;
+
+            const modal = document.getElementById("event-modal");
+            document.getElementById("event-title").innerText = "💘 告白のとき…！";
+            document.getElementById("event-actor-emoji").innerText = actor.emoji;
+            document.getElementById("event-actor-name").innerText = actor.name;
+            document.getElementById("event-target-emoji").innerText = target.emoji;
+            document.getElementById("event-target-name").innerText = target.name;
+            document.getElementById("event-heart").innerText = "❓";
+            
+            // ステージ進行
+            document.getElementById("event-speech").innerText = `「あの、${target.name}さん！ ちょっとお話があります…！」`;
+            
+            const nextBtn = document.getElementById("event-next-btn");
+            nextBtn.innerText = "つぎへ進む";
+            nextBtn.onclick = handleLoveEventStep;
+
+            modal.classList.remove("hidden");
+        }
+
+        function handleLoveEventStep() {
+            currentEventStep++;
+            const speech = document.getElementById("event-speech");
+            const nextBtn = document.getElementById("event-next-btn");
+            const heart = document.getElementById("event-heart");
+
+            if (currentEventStep === 1) {
+                // 告白する
+                speech.innerText = `「ずっと前から${eventTarget.name}さんのことが好きでした！ 僕と、付き合ってください！！」`;
+                heart.innerText = "💔";
+                heart.className = "text-4xl animate-bounce";
+            } else if (currentEventStep === 2) {
+                // 結果発表
+                // 確率判定（Miiたちのなかよしレベルが高いほど成功しやすい。今回は簡易的に50%）
+                const isSuccess = Math.random() > 0.4;
+                if (isSuccess) {
+                    heart.innerText = "💖💖💖";
+                    speech.innerText = `「…はい！ 喜んで！ よろしくお願いします！」`;
+                    
+                    // 関係を更新
+                    eventActor.relationships[eventTarget.id] = "恋人";
+                    eventTarget.relationships[eventActor.id] = "恋人";
+                    eventActor.status = "none";
+                    eventActor.statusTargetId = null;
+                    eventActor.statusText = `${eventTarget.name}と付き合うことになって、毎日がパラダイスです！💑`;
+                    eventActor.level += 2;
+                    eventTarget.level += 1;
+                    
+                    // お祝い金
+                    game.money += 1500;
+
+                    addNews(`【超おめでた】島内ニュース！ ${eventActor.name}さんと ${eventTarget.name}さんの恋がついに実りました！末永くお幸せに！ 🎉`);
+                } else {
+                    heart.innerText = "😭😭";
+                    speech.innerText = `「ごめんなさい…今は友達のままでいてほしいです。」`;
+
+                    // 失恋
+                    eventActor.relationships[eventTarget.id] = "友達";
+                    eventActor.status = "none";
+                    eventActor.statusTargetId = null;
+                    eventActor.statusText = "失恋しちゃった…悲しいけど、美味しいものでも食べて元気を出すよ。";
+                    
+                    addNews(`【切ない】${eventActor.name}さんの恋心は、${eventTarget.name}さんには届きませんでした。慰めてあげましょう。`);
+                }
+                nextBtn.innerText = "現実に戻る";
+            } else {
+                // 終了
+                document.getElementById("event-modal").classList.add("hidden");
+                updateTopUI();
+                renderApartment();
+            }
+        }
+
+        // ケンカ仲直り処理
+        function resolveFight(mii, targetMii) {
+            alert(`${mii.name}と ${targetMii.name}を呼び出して話し合いをさせました。`);
+            const isSuccess = Math.random() > 0.3;
+
+            if (isSuccess) {
+                alert(`仲直り大成功！\n二人はお互いに「ごめんね」と言って、再び親友になりました！`);
+                mii.status = 'none';
+                mii.statusText = "ご迷惑をおかけしました！無事に仲直りできました！";
+                mii.relationships[targetMii.id] = "友達";
+                targetMii.relationships[mii.id] = "友達";
+                mii.level++;
+                game.money += 800; // 仲裁金
+            } else {
+                alert(`話し合いましたが、まだお互いにそっぽを向いてしまいました…時間を置きましょう。`);
+                mii.statusText = "まだ顔を合わせたくないです…";
+            }
+            
+            closeMiiDetailModal();
+            updateTopUI();
+            renderApartment();
+        }
+
+        // --- 13. 時間を進める (シミュレーション & イベント自動発生) ---
+        function advanceTime() {
+            if (game.residents.length === 0) {
+                alert("島に誰もいません。まずはMiiを作ってみましょう！");
+                return;
+            }
+
+            // 1. 各Miiの満腹度が下がる
+            game.residents.forEach(mii => {
+                const hungerLoss = Math.floor(Math.random() * 20) + 10; // 10-30減る
+                mii.hunger = Math.max(0, mii.hunger - hungerLoss);
+
+                // 2. お腹すきすぎるとステータスがお悩みに
+                if (mii.hunger < 30 && mii.status === 'none') {
+                    mii.status = 'hunger';
+                    mii.statusText = "お腹がすきすぎて、もう一歩も歩けません…何か食べたいな…";
+                }
+            });
+
+            // 3. ランダムにお悩み/イベントが新規発生
+            const luckyResident = game.residents[Math.floor(Math.random() * game.residents.length)];
+            
+            if (luckyResident && luckyResident.status === 'none') {
+                const eventChance = Math.random();
+
+                if (eventChance < 0.4 && game.residents.length >= 2) {
+                    // A. 恋愛イベントのタネ
+                    // 自分以外の相手を一人探す
+                    const pool = game.residents.filter(m => m.id !== luckyResident.id);
+                    const lover = pool[Math.floor(Math.random() * pool.length)];
+                    
+                    luckyResident.status = 'love';
+                    luckyResident.statusTargetId = lover.id;
+                    luckyResident.statusText = `${lover.name}さんのことがどうしても頭から離れません…告白したいです。💖`;
+                    luckyResident.relationships[lover.id] = "片思い";
+
+                    addNews(`【ウワサ】${luckyResident.name}さんが誰かに熱い視線を送っているとの情報を極秘入手しました。`);
+                } else if (eventChance < 0.7 && game.residents.length >= 2) {
+                    // B. ケンカ発生のタネ
+                    const pool = game.residents.filter(m => m.id !== luckyResident.id);
+                    const enemy = pool[Math.floor(Math.random() * pool.length)];
+
+                    luckyResident.status = 'fight';
+                    luckyResident.statusTargetId = enemy.id;
+                    luckyResident.statusText = `${enemy.name}とささいなことでケンカをして気まずいんだ…`;
+                    luckyResident.relationships[enemy.id] = "ケンカ中";
+                    enemy.relationships[luckyResident.id] = "ケンカ中";
+
+                    addNews(`【騒然】マンションの廊下で${luckyResident.name}さんと${enemy.name}さんが大激突！不穏な空気が流れています。`);
+                } else {
+                    // C. ひとりごと、おやつをねだる
+                    luckyResident.statusText = STATUS_SPEECHES.none[Math.floor(Math.random() * STATUS_SPEECHES.none.length)];
+                }
+            }
+
+            // 給料（お小遣いが入る）
+            const salary = game.residents.length * 300;
+            game.money += salary;
+
+            alert(`時間が少し進みました！\n・Miiたちのお腹がすきました。\n・島民の管理報酬として 🪙${salary}円 を獲得しました！\n島民たちの様子を見に行きましょう。`);
+            
+            updateTopUI();
+            renderApartment();
+        }
+
+        // ニューステッカーに流す新しいメッセージを追加
+        function addNews(msg) {
+            document.getElementById("news-content").innerText = msg;
+        }
+    </script>
+</body>
+</html>
